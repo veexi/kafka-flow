@@ -1,0 +1,23 @@
+server:
+  port: 8080
+  error:
+    include-message: always
+
+spring:
+  application:
+    name: kafka-flow
+  mvc:
+    static-path-pattern: /**
+  resources:
+    static-locations: classpath:/static/
+
+logging:
+  level:
+    root: INFO
+    com.example.kafkaflow: DEBUG
+    org.apache.kafka: WARN
+
+# Custom KafkaFlow settings
+kafkaflow:
+  # Path to the cluster configuration file, relative to the application working directory
+  config-path: config.json

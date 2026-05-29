@@ -1,0 +1,27 @@
+server:
+  port: 8080
+  error:
+    include-message: always
+
+spring:
+  application:
+    name: kafka-flow
+  mvc:
+    static-path-pattern: /**
+  resources:
+    static-locations: classpath:/static/
+
+logging:
+  level:
+    root: INFO
+    com.example.kafkaflow: INFO # Set to INFO for production; change to DEBUG if troubleshooting
+    org.apache.kafka: WARN
+  pattern:
+    file: "%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"
+  file:
+    name: logs/app.log # Direct application logs to your dedicated logs/ directory
+
+# Custom KafkaFlow settings
+kafkaflow:
+  # Path to the cluster configuration file, relative to the application working directory
+  config-path: config/config.json

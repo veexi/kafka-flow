@@ -1,0 +1,38 @@
+{
+  "port" : 8080,
+  "clusters" : [ {
+    "id" : "sasl-scram-test",
+    "name" : "Company Testing Cluster (SASL/SCRAM)",
+    "brokers" : [ "kafka-broker-1:9092", "kafka-broker-2:9092" ],
+    "schemaRegistry" : "http://schema-registry.company.com:8081",
+    "sasl" : {
+      "mechanism" : "SCRAM-SHA-512",
+      "username" : "test-user",
+      "password" : "test-password-change-me"
+    },
+    "ssl" : null
+  }, {
+    "id" : "sasl-plain-test",
+    "name" : "Company Testing Cluster (SASL/PLAIN)",
+    "brokers" : [ "kafka-broker-3:9092" ],
+    "schemaRegistry" : null,
+    "sasl" : {
+      "mechanism" : "PLAIN",
+      "username" : "plain-user",
+      "password" : "plain-password-change-me"
+    },
+    "ssl" : {
+      "truststoreLocation" : "certs/truststore.jks",
+      "truststorePassword" : "truststore-pass",
+      "keystoreLocation" : null,
+      "keystorePassword" : null
+    }
+  }, {
+    "id" : "3e317eb6-3f60-4238-85c9-17685eb7e092",
+    "name" : "公司测试环境241kafka",
+    "brokers" : [ "192.168.4.241:9092" ],
+    "schemaRegistry" : null,
+    "sasl" : null,
+    "ssl" : null
+  } ]
+}

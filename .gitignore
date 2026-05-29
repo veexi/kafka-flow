@@ -1,0 +1,36 @@
+# Maven Build outputs
+target/
+*.jar
+*.war
+*.zip
+*.tar.gz
+
+# Frontend Build and dependencies
+node_modules/
+dist/
+.eslintcache
+
+# IDE specific settings
+.idea/
+*.iml
+.vscode/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# Operating System specific files
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+.DS_Store
+
+# Application Specific configurations
+application-local.yml
+application-dev.yml
+*.log
+
+# Kerberos Keytabs
+keytabs/
+
