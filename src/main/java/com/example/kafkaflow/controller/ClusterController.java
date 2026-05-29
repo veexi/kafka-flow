@@ -142,7 +142,8 @@ public class ClusterController {
                     newCluster.ssl().truststoreLocation().trim(),
                     newCluster.ssl().truststorePassword() != null ? newCluster.ssl().truststorePassword().trim() : "",
                     newCluster.ssl().keystoreLocation() != null ? newCluster.ssl().keystoreLocation().trim() : null,
-                    newCluster.ssl().keystorePassword() != null ? newCluster.ssl().keystorePassword().trim() : null
+                    newCluster.ssl().keystorePassword() != null ? newCluster.ssl().keystorePassword().trim() : null,
+                    newCluster.ssl().skipHostnameVerification() != null ? newCluster.ssl().skipHostnameVerification() : false
                 );
             }
 
@@ -236,7 +237,8 @@ public class ClusterController {
                     cluster.ssl().truststoreLocation().trim(),
                     cluster.ssl().truststorePassword() != null ? cluster.ssl().truststorePassword().trim() : "",
                     cluster.ssl().keystoreLocation() != null ? cluster.ssl().keystoreLocation().trim() : null,
-                    cluster.ssl().keystorePassword() != null ? cluster.ssl().keystorePassword().trim() : null
+                    cluster.ssl().keystorePassword() != null ? cluster.ssl().keystorePassword().trim() : null,
+                    cluster.ssl().skipHostnameVerification() != null ? cluster.ssl().skipHostnameVerification() : false
                 );
             }
 

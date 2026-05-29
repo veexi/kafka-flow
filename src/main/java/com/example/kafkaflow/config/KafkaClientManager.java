@@ -207,6 +207,9 @@ public class KafkaClientManager {
                 props.put("ssl.keystore.location", ssl.keystoreLocation());
                 props.put("ssl.keystore.password", ssl.keystorePassword());
             }
+            if (ssl.skipHostnameVerification() != null && ssl.skipHostnameVerification()) {
+                props.put("ssl.endpoint.identification.algorithm", "");
+            }
         }
 
         return props;

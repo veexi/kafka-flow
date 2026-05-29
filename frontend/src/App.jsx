@@ -89,6 +89,7 @@ export default function App() {
   const [clusterFormSslTruststorePassword, setClusterFormSslTruststorePassword] = useState('')
   const [clusterFormSslKeystoreLocation, setClusterFormSslKeystoreLocation] = useState('')
   const [clusterFormSslKeystorePassword, setClusterFormSslKeystorePassword] = useState('')
+  const [clusterFormSslSkipHostnameVerification, setClusterFormSslSkipHostnameVerification] = useState(false)
   const [savingClusterConfig, setSavingClusterConfig] = useState(false)
   const [testingClusterConfig, setTestingClusterConfig] = useState(false)
 
@@ -451,6 +452,7 @@ export default function App() {
     setClusterFormSslTruststorePassword('')
     setClusterFormSslKeystoreLocation('')
     setClusterFormSslKeystorePassword('')
+    setClusterFormSslSkipHostnameVerification(false)
     setShowEditClusterForm(true)
   }
 
@@ -494,12 +496,14 @@ export default function App() {
         setClusterFormSslTruststorePassword(data.ssl.truststorePassword || '')
         setClusterFormSslKeystoreLocation(data.ssl.keystoreLocation || '')
         setClusterFormSslKeystorePassword(data.ssl.keystorePassword || '')
+        setClusterFormSslSkipHostnameVerification(data.ssl.skipHostnameVerification || false)
       } else {
         setClusterFormHasSsl(false)
         setClusterFormSslTruststoreLocation('')
         setClusterFormSslTruststorePassword('')
         setClusterFormSslKeystoreLocation('')
         setClusterFormSslKeystorePassword('')
+        setClusterFormSslSkipHostnameVerification(false)
       }
       
       setShowEditClusterForm(true)
@@ -530,6 +534,8 @@ export default function App() {
           setClusterFormSslTruststoreLocation(data.serverFilePath)
         } else if (type === 'keystore') {
           setClusterFormSslKeystoreLocation(data.serverFilePath)
+        } else if (type === 'krb5') {
+          setClusterFormKerberosKrb5Conf(data.serverFilePath)
         }
         alert(`✅ File '${data.fileName}' successfully uploaded and saved on server path:\n${data.serverFilePath}`)
       } else {
@@ -606,7 +612,8 @@ export default function App() {
           truststoreLocation: clusterFormSslTruststoreLocation.trim(),
           truststorePassword: clusterFormSslTruststorePassword,
           keystoreLocation: clusterFormSslKeystoreLocation.trim() || null,
-          keystorePassword: clusterFormSslKeystorePassword || null
+          keystorePassword: clusterFormSslKeystorePassword || null,
+          skipHostnameVerification: clusterFormSslSkipHostnameVerification
         } : null
       }
 
@@ -653,7 +660,8 @@ export default function App() {
           truststoreLocation: clusterFormSslTruststoreLocation.trim(),
           truststorePassword: clusterFormSslTruststorePassword,
           keystoreLocation: clusterFormSslKeystoreLocation.trim() || null,
-          keystorePassword: clusterFormSslKeystorePassword || null
+          keystorePassword: clusterFormSslKeystorePassword || null,
+          skipHostnameVerification: clusterFormSslSkipHostnameVerification
         } : null
       }
       
@@ -1969,13 +1977,24 @@ export default function App() {
                           </div>
                           <div className="query-field" style={{ gridColumn: 'span 2' }}>
                             <label>krb5.conf Path <span style={{ fontWeight: 400, opacity: 0.6 }}>(optional, leave blank to use system default)</span></label>
-                            <input 
-                              type="text" 
-                              className="input-control" 
-                              placeholder="/etc/krb5.conf"
-                              value={clusterFormKerberosKrb5Conf}
-                              onChange={e => setClusterFormKerberosKrb5Conf(e.target.value)}
-                            />
+                            <div style={{ display: 'flex', gap: '8px' }}>
+                              <input 
+                                type="text" 
+                                className="input-control" 
+                                placeholder="/etc/krb5.conf"
+                                value={clusterFormKerberosKrb5Conf}
+                                onChange={e => setClusterFormKerberosKrb5Conf(e.target.value)}
+                                style={{ flex: 1 }}
+                              />
+                              <label className="btn btn-secondary btn-sm" style={{ cursor: 'pointer', padding: '10px 14px', whiteSpace: 'nowrap', display: 'flex', alignItems: 'center' }} title="Upload krb5.conf file from local machine to server">
+                                Upload
+                                <input 
+                                  type="file" 
+                                  style={{ display: 'none' }} 
+                                  onChange={e => handleSslFileChange(e, 'krb5')} 
+                                />
+                              </label>
+                            </div>
                           </div>
 
                           {/* Auth Type Selector */}
@@ -2147,6 +2166,16 @@ export default function App() {
                             value={clusterFormSslKeystorePassword}
                             onChange={e => setClusterFormSslKeystorePassword(e.target.value)}
                           />
+                        </div>
+                        <div className="query-field" style={{ gridColumn: 'span 2', display: 'flex', alignItems: 'center', marginTop: '6px' }}>
+                          <label style={{ display: 'flex', alignItems: 'center', gap: '8px', fontWeight: '500', cursor: 'pointer', margin: 0 }}>
+                            <input 
+                              type="checkbox" 
+                              checked={clusterFormSslSkipHostnameVerification} 
+                              onChange={e => setClusterFormSslSkipHostnameVerification(e.target.checked)} 
+                            />
+                            Skip Hostname Verification (跳过主机名校验)
+                          </label>
                         </div>
                       </div>
                     )}

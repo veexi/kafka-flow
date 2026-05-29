@@ -39,7 +39,8 @@ public class AppConfig {
         String truststoreLocation,
         String truststorePassword,
         String keystoreLocation,
-        String keystorePassword
+        String keystorePassword,
+        Boolean skipHostnameVerification
     ) {}
 
     public record ClusterSettings(
