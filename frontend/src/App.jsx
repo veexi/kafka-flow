@@ -1135,7 +1135,7 @@ export default function App() {
                   <div style={{ display: 'flex', flexDirection: 'column', flex: 1, overflow: 'hidden' }}>
                     {/* Query builder bar */}
                     <div className="query-bar">
-                      <div className="query-field">
+                      <div className="query-field query-field-partition">
                         <label>Partition</label>
                         <select 
                           className="select-control"
@@ -1151,7 +1151,7 @@ export default function App() {
                         </select>
                       </div>
 
-                      <div className="query-field">
+                      <div className="query-field query-field-seek-type">
                         <label>Seek Type</label>
                         <select 
                           className="select-control"
@@ -1166,7 +1166,7 @@ export default function App() {
                       </div>
 
                       {msgSeekType === 'OFFSET' && (
-                        <div className="query-field">
+                        <div className="query-field query-field-seek-offset">
                           <label>Seek Offset</label>
                           <input 
                             type="number" 
@@ -1179,7 +1179,7 @@ export default function App() {
                       )}
 
                       {msgSeekType === 'TIMESTAMP' && (
-                        <div className="query-field">
+                        <div className="query-field query-field-seek-time">
                           <label>Seek Time</label>
                           <input 
                             type="datetime-local" 
@@ -1190,7 +1190,7 @@ export default function App() {
                         </div>
                       )}
 
-                      <div className="query-field">
+                      <div className="query-field query-field-limit">
                         <label>Limit</label>
                         <select 
                           className="select-control"
@@ -1204,7 +1204,7 @@ export default function App() {
                         </select>
                       </div>
 
-                      <div className="query-field">
+                      <div className="query-field query-field-key-decoder">
                         <label>Key Decoder</label>
                         <select 
                           className="select-control"
@@ -1218,7 +1218,7 @@ export default function App() {
                         </select>
                       </div>
 
-                      <div className="query-field">
+                      <div className="query-field query-field-value-decoder">
                         <label>Value Decoder</label>
                         <select 
                           className="select-control"
@@ -1232,7 +1232,7 @@ export default function App() {
                         </select>
                       </div>
 
-                      <div className="query-field">
+                      <div className="query-field query-field-sort">
                         <label>Sort By</label>
                         <select 
                           className="select-control"
@@ -1248,7 +1248,7 @@ export default function App() {
                         </select>
                       </div>
 
-                      <div className="query-field">
+                      <div className="query-field query-field-keyword">
                         <label>Server Search Keyword</label>
                         <input 
                           type="text" 
@@ -1260,10 +1260,10 @@ export default function App() {
                       </div>
 
                       <button 
-                        className="btn" 
+                        className="btn query-btn-consume" 
                         onClick={loadMessages}
                         disabled={loadingMessages}
-                        style={{ height: '40px' }}
+                        style={{ height: '36px' }}
                       >
                         {loadingMessages ? 'Consuming...' : 'Consume'}
                       </button>
