@@ -1,5 +1,96 @@
 import React, { useState, useEffect, useRef } from 'react'
 
+const CopyButton = ({ text }) => {
+  const [copied, setCopied] = useState(false)
+
+  const handleCopy = async (e) => {
+    e.stopPropagation()
+    if (!text) return
+    const textStr = typeof text === 'string' ? text : String(text)
+    
+    let success = false
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      try {
+        await navigator.clipboard.writeText(textStr)
+        success = true
+      } catch (err) {
+        console.error('navigator.clipboard failed, falling back', err)
+      }
+    }
+    
+    if (!success) {
+      try {
+        const textArea = document.createElement('textarea')
+        textArea.value = textStr
+        textArea.style.top = '0'
+        textArea.style.left = '0'
+        textArea.style.position = 'fixed'
+        textArea.style.opacity = '0'
+        document.body.appendChild(textArea)
+        textArea.focus()
+        textArea.select()
+        const successful = document.execCommand('copy')
+        document.body.removeChild(textArea)
+        if (successful) {
+          success = true
+        }
+      } catch (err) {
+        console.error('Fallback copy failed', err)
+      }
+    }
+    
+    if (success) {
+      setCopied(true)
+      setTimeout(() => setCopied(false), 2000)
+    }
+  }
+
+  return (
+    <button
+      type="button"
+      className="copy-btn"
+      onClick={handleCopy}
+      title="Copy to clipboard"
+      style={{
+        background: 'none',
+        border: 'none',
+        cursor: 'pointer',
+        padding: '4px',
+        display: 'inline-flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        color: copied ? '#10b981' : 'var(--text-secondary, #9ca3af)',
+        transition: 'color 0.2s ease, background-color 0.2s ease',
+        borderRadius: '6px',
+      }}
+      onMouseEnter={(e) => {
+        e.currentTarget.style.backgroundColor = 'var(--bg-hover, rgba(255,255,255,0.05))'
+      }}
+      onMouseLeave={(e) => {
+        e.currentTarget.style.backgroundColor = 'transparent'
+      }}
+    >
+      {copied ? (
+        <span style={{ fontSize: '0.75rem', marginRight: '6px', color: '#10b981', fontWeight: '500' }}>Copied!</span>
+      ) : null}
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        width="14"
+        height="14"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      >
+        <rect width="14" height="14" x="8" y="8" rx="2" ry="2" />
+        <path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2" />
+      </svg>
+    </button>
+  )
+}
+
 export default function App() {
   // Navigation & Caches
   const [clusters, setClusters] = useState([])
@@ -1441,7 +1532,12 @@ export default function App() {
 
                             {/* Key */}
                             <div className="payload-container">
-                              <span className="meta-label">Record Key</span>
+                              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                <span className="meta-label">Record Key</span>
+                                {selectedMessage.key !== null && (
+                                  <CopyButton text={formatPayload(selectedMessage.key)} />
+                                )}
+                              </div>
                               <pre className="payload-pre" style={{ maxHeight: '100px' }}>
                                 {selectedMessage.key === null ? '/* [No Key] */' : formatPayload(selectedMessage.key)}
                               </pre>
@@ -1450,7 +1546,12 @@ export default function App() {
                             {/* Value */}
                             <div className="payload-container">
                               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                                <span className="meta-label">Record Payload Value</span>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                  <span className="meta-label">Record Payload Value</span>
+                                  {selectedMessage.value !== null && selectedMessage.value !== undefined && (
+                                    <CopyButton text={payloadFormatMode === 'formatted' ? formatPayload(selectedMessage.value) : selectedMessage.value} />
+                                  )}
+                                </div>
                                 {selectedMessage.value && (() => {
                                   const trimmed = selectedMessage.value.trim();
                                   return (trimmed.startsWith('{') && trimmed.endsWith('}')) || (trimmed.startsWith('[') && trimmed.endsWith(']'));

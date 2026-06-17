@@ -22,8 +22,23 @@ import java.util.concurrent.ConcurrentHashMap;
 public class AvroDeserializer {
     private static final Logger log = LoggerFactory.getLogger(AvroDeserializer.class);
     
+    private static final GenericData GENERIC_DATA = new GenericData();
+    static {
+        GENERIC_DATA.addLogicalTypeConversion(new org.apache.avro.Conversions.DecimalConversion());
+        GENERIC_DATA.addLogicalTypeConversion(new org.apache.avro.Conversions.UUIDConversion());
+        GENERIC_DATA.addLogicalTypeConversion(new org.apache.avro.data.TimeConversions.DateConversion());
+        GENERIC_DATA.addLogicalTypeConversion(new org.apache.avro.data.TimeConversions.TimeMillisConversion());
+        GENERIC_DATA.addLogicalTypeConversion(new org.apache.avro.data.TimeConversions.TimeMicrosConversion());
+        GENERIC_DATA.addLogicalTypeConversion(new org.apache.avro.data.TimeConversions.TimestampMillisConversion());
+        GENERIC_DATA.addLogicalTypeConversion(new org.apache.avro.data.TimeConversions.TimestampMicrosConversion());
+        GENERIC_DATA.addLogicalTypeConversion(new org.apache.avro.data.TimeConversions.LocalTimestampMillisConversion());
+        GENERIC_DATA.addLogicalTypeConversion(new org.apache.avro.data.TimeConversions.LocalTimestampMicrosConversion());
+    }
+
     private final RestTemplate restTemplate = new RestTemplate();
-    private final ObjectMapper objectMapper = new ObjectMapper();
+    private final ObjectMapper objectMapper = new ObjectMapper()
+            .registerModule(new com.fasterxml.jackson.datatype.jsr310.JavaTimeModule())
+            .configure(com.fasterxml.jackson.databind.SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
     
     // Schema Cache per (Registry URL + Schema ID)
     private final Map<String, Schema> schemaCache = new ConcurrentHashMap<>();
@@ -69,7 +84,7 @@ public class AvroDeserializer {
      * Decode Avro binary data using a parsed schema and convert it to pretty JSON.
      */
     private String decodeAvroWithSchema(byte[] data, int offset, int length, Schema schema) throws Exception {
-        GenericDatumReader<GenericRecord> reader = new GenericDatumReader<>(schema);
+        GenericDatumReader<GenericRecord> reader = new GenericDatumReader<>(schema, schema, GENERIC_DATA);
         ByteArrayInputStream in = new ByteArrayInputStream(data, offset, length);
         BinaryDecoder decoder = DecoderFactory.get().binaryDecoder(in, null);
         
@@ -135,7 +150,22 @@ public class AvroDeserializer {
         if (obj instanceof ByteBuffer byteBuffer) {
             byte[] bytes = new byte[byteBuffer.remaining()];
             byteBuffer.get(bytes);
-            return Base64.getEncoder().encodeToString(bytes); // Fallback to Base64 for raw bytes
+            
+            // Try to see if the bytes themselves are already an ASCII hex string
+            try {
+                String str = new String(bytes, java.nio.charset.StandardCharsets.UTF_8);
+                if (str.length() > 0 && str.length() % 2 == 0 && str.matches("^[0-9a-fA-F]+$")) {
+                    return "0x" + str;
+                }
+            } catch (Exception ignored) {
+            }
+            
+            // Otherwise, convert raw bytes to hex string starting with 0x
+            StringBuilder sb = new StringBuilder("0x");
+            for (byte b : bytes) {
+                sb.append(String.format("%02x", b));
+            }
+            return sb.toString();
         }
 
         if (obj instanceof CharSequence) {
